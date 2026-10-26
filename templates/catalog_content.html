@@ -1,0 +1,70 @@
+<header class="catalog-header">
+    <p class="section-eyebrow">Catalog</p>
+    <h1>Premium Headphones</h1>
+    <p>The full AudioZone range. Choose a pair that suits you.</p>
+</header>
+
+<section class="catalog-products">
+    <div class="products-grid">
+        {% for headphone, details in headphones.items() %}
+        <article class="product-card"
+                 data-product-card
+                 data-price="{{ details.price }}"
+                 data-brand="{{ headphone.split()[0] }}"
+                 data-colors="{{ details.colors|join(',') }}"
+                 data-stock="{{ details.stock }}">
+            <div class="product-image">
+                <img src="{{ details.image }}" alt="{{ headphone }}">
+            </div>
+            <div class="product-info">
+                <h2>{{ headphone }}</h2>
+                <p class="product-description">{{ details.description }}</p>
+                <p class="product-price">${{ details.price }}</p>
+                <p class="product-stock">In Stock: {{ details.stock }}</p>
+                <form action="{{ url_for('add_to_cart') }}" method="post">
+                    <input type="hidden" name="next" value="{{ request.path }}#catalog">
+                    <input type="hidden" name="headphone" value="{{ headphone }}">
+                    <label>Quantity</label>
+                    <input type="number" name="quantity" value="1" min="1" max="{{ details.stock }}">
+                    <label>Color</label>
+                    <select name="color">
+                        {% for color in details.colors %}
+                        <option value="{{ color }}">{{ color }}</option>
+                        {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-primary btn-block">Add to Cart</button>
+                </form>
+                {% with messages = get_flashed_messages(category_filter=[headphone, headphone ~ '_error']) %}
+                    {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                {% endwith %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="addons catalog-addons">
+    <h2>Add-ons &amp; Accessories</h2>
+    <p>Accessories to go with your headphones.</p>
+    <div class="addons-grid">
+        {% for addon, details in addons.items() %}
+        <article class="addon-card">
+            <div class="addon-info">
+                <h2>{{ details.name }}</h2>
+                <p class="addon-description">{{ details.description }}</p>
+                <p class="addon-price">${{ details.price }}</p>
+                <p class="addon-stock">In Stock: {{ details.stock }}</p>
+                <form action="{{ url_for('add_to_cart') }}" method="post">
+                    <input type="hidden" name="next" value="{{ request.path }}#catalog">
+                    <input type="hidden" name="addon" value="{{ details.name }}">
+                    <label>Quantity</label>
+                    <input type="number" name="quantity" value="1" min="1" max="{{ details.stock }}">
+                    <button type="submit" class="btn btn-secondary btn-block">Add to Cart</button>
+                </form>
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+</section>

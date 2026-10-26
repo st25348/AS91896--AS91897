@@ -43,13 +43,9 @@ def orders_db_path():
     os.makedirs(app.instance_path, exist_ok=True)
     return os.path.join(app.instance_path, 'orders.db')
 
-def reviews_db_path():
+def contacts_db_path():
     os.makedirs(app.instance_path, exist_ok=True)
-    return os.path.join(app.instance_path, 'community_reviews.db')
-
-def feedback_db_path():
-    os.makedirs(app.instance_path, exist_ok=True)
-    return os.path.join(app.instance_path, 'feedback.db')
+    return os.path.join(app.instance_path, 'contacts.db')
 
 def invoice_folder_path():
     path = os.path.join(app.instance_path, 'invoices')
@@ -71,9 +67,48 @@ def load_data():
         addons = {}
     return headphones, addons
 
-def save_headphones(headphones):
-    with open('data/headphones.json', 'w') as f:
-        json.dump(headphones, f, indent=4)
+def save_headphones(headphones, source='Inventory update'):
+    save_inventory_data('data/headphones.json', headphones, source)
+
+def save_addons(addons, source='Inventory update'):
+    save_inventory_data('data/addons.json', addons, source)
+
+def log_stock_change(name, old_stock, new_stock, source):
+    if old_stock == new_stock:
+        return
+    if old_stock is None:
+        change = f'added with {new_stock} in stock'
+    elif new_stock is None:
+        change = f'removed from stock (was {old_stock})'
+    else:
+        change = f'{old_stock} -> {new_stock}'
+
+    log_path = os.path.join(os.path.dirname(__file__), 'stock_updates.txt')
+    timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    try:
+        with open(log_path, 'a', encoding='utf-8') as f:
+            f.write(f'{timestamp} | {source} | {name}: {change}\n')
+    except OSError as e:
+        print(f'Could not write stock update log: {e}')
+
+def save_inventory_data(path, items, source):
+    try:
+        with open(path, encoding='utf-8') as f:
+            previous_items = json.load(f)
+    except (FileNotFoundError, json.JSONDecodeError):
+        previous_items = {}
+
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(items, f, indent=4)
+
+    for name, details in items.items():
+        old_stock = previous_items.get(name, {}).get('stock')
+        new_stock = details.get('stock')
+        log_stock_change(name, old_stock, new_stock, source)
+
+    for name, details in previous_items.items():
+        if name not in items:
+            log_stock_change(name, details.get('stock'), None, source)
 
 
 # parse and validate product form
@@ -114,80 +149,6 @@ def calculate_total(cart):
 def cart_redirect():
     target = request.form.get('next') or request.referrer or url_for('home')
     return redirect(target)
-
-def load_featured_products(headphones, limit=4):
-    return dict(list(headphones.items())[:limit])
-
-
-# fallback testimonials
-def default_testimonials():
-    return [
-        {'name': 'Maya Chen',    'product': 'Sony WH-1000XM5',     'rating': 5, 'quote': 'The noise cancellation made my commute feel calm for the first time in years.'},
-        {'name': 'Noah Patel',   'product': 'AirPods Pro',          'rating': 5, 'quote': 'Crisp sound, fast delivery, and the fit is perfect for long work sessions.'},
-        {'name': 'Ava Thompson', 'product': 'Bose QuietComfort 45', 'rating': 4, 'quote': 'Lightweight, comfortable, and exactly the upgrade I wanted for travel.'},
-    ]
-
-
-# pull public reviews
-def get_public_testimonials(limit=None):
-    testimonials = []
-    try:
-        with sqlite3.connect(reviews_db_path()) as conn:
-            conn.row_factory = sqlite3.Row
-            cursor = conn.cursor()
-            query = '''
-                SELECT customer_name, product_name, rating, review_text, created_at
-                FROM community_reviews
-                WHERE rating >= 4 AND review_text != ''
-                ORDER BY created_at DESC
-            '''
-            if limit:
-                query += ' LIMIT ?'
-                rows = cursor.execute(query, (limit,)).fetchall()
-            else:
-                rows = cursor.execute(query).fetchall()
-            testimonials = [
-                {'name': row['customer_name'], 'product': row['product_name'],
-                 'rating': row['rating'], 'quote': row['review_text']}
-                for row in rows
-            ]
-    except sqlite3.Error:
-        testimonials = []
-
-    if not testimonials:
-        testimonials = default_testimonials()
-    return testimonials[:limit] if limit else testimonials
-
-def get_community_stats():
-    stats = {
-        'total_sales': 0,
-        'orders_completed': 0,
-        'five_star_reviews': 0,
-        'total_reviews': 0,
-    }
-    try:
-        with sqlite3.connect(orders_db_path()) as conn:
-            row = conn.execute('SELECT COALESCE(SUM(total), 0), COUNT(*) FROM orders').fetchone()
-            stats['total_sales'] = round(row[0] or 0, 2)
-            stats['orders_completed'] = row[1] or 0
-    except sqlite3.Error:
-        pass
-
-    try:
-        with sqlite3.connect(reviews_db_path()) as conn:
-            row = conn.execute('''
-                SELECT
-                    SUM(CASE WHEN rating = 5 THEN 1 ELSE 0 END),
-                    COUNT(*)
-                FROM community_reviews
-            ''').fetchone()
-            stats['five_star_reviews'] = row[0] or 0
-            stats['total_reviews'] = row[1] or 0
-    except sqlite3.Error:
-        pass
-
-    return stats
-
 
 # fetch single order for current user
 def get_order_for_user(invoice_number):
@@ -289,23 +250,10 @@ def init_orders_db():
             except sqlite3.OperationalError:
                 pass
 
-def init_reviews_db():
-    with sqlite3.connect(reviews_db_path()) as conn:
+def init_contacts_db():
+    with sqlite3.connect(contacts_db_path()) as conn:
         conn.execute('''
-            CREATE TABLE IF NOT EXISTS community_reviews (
-                id            INTEGER PRIMARY KEY AUTOINCREMENT,
-                product_name  TEXT NOT NULL,
-                customer_name TEXT NOT NULL,
-                rating        INTEGER NOT NULL,
-                review_text   TEXT NOT NULL,
-                created_at    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-
-def init_feedback_db():
-    with sqlite3.connect(feedback_db_path()) as conn:
-        conn.execute('''
-            CREATE TABLE IF NOT EXISTS feedback_messages (
+            CREATE TABLE IF NOT EXISTS contact_messages (
                 id         INTEGER PRIMARY KEY AUTOINCREMENT,
                 name       TEXT NOT NULL,
                 email      TEXT NOT NULL,
@@ -318,8 +266,7 @@ def initialize_data_base():
     try:
         migrate_invoice_storage()
         init_orders_db()
-        init_reviews_db()
-        init_feedback_db()
+        init_contacts_db()
     except sqlite3.Error as e:
         print(f"Error initializing databases: {e}")
 
@@ -520,7 +467,7 @@ def add_product():
         return redirect(url_for('admin'))
     headphones[product['name']] = product['details']
     try:
-        save_headphones(headphones)
+        save_headphones(headphones, 'Admin')
         flash(f"{product['name']} was added.", 'admin_success')
     except OSError:
         flash("Could not save the new product.", 'admin_error')
@@ -544,7 +491,7 @@ def update_product(product_name):
         headphones.pop(product_name)
     headphones[product['name']] = product['details']
     try:
-        save_headphones(headphones)
+        save_headphones(headphones, 'Admin')
         flash(f"{product['name']} was updated.", 'admin_success')
     except OSError:
         flash("Could not save product changes.", 'admin_error')
@@ -553,75 +500,30 @@ def update_product(product_name):
 @app.route('/')
 @app.route('/home')
 def home():
-    headphones, _ = load_data()
-    reopen_auth   = session.pop('reopen_auth', None)
-    return render_template(
-        'index.html',
-        featured     = load_featured_products(headphones),
-        testimonials = get_public_testimonials(6),
-        reopen_auth  = reopen_auth,
-    )
-
-@app.route('/catalog')
-def catalog():
     headphones, addons = load_data()
     reopen_auth = session.pop('reopen_auth', None)
     return render_template(
-        'catalog.html',
-        headphones  = headphones,
-        addons      = addons,
-        reopen_auth = reopen_auth,
+        'index.html',
+        headphones=headphones,
+        addons=addons,
+        reopen_auth=reopen_auth,
     )
 
-@app.route('/community')
-def community():
-    headphones, _ = load_data()
-    reopen_auth   = session.pop('reopen_auth', None)
-    return render_template(
-        'community.html',
-        headphones   = headphones,
-        stats        = get_community_stats(),
-        reopen_auth  = reopen_auth,
-    )
-
-@app.route('/community/review', methods=['POST'])
-def community_review():
-    product_name  = request.form.get('product_name', '').strip()
-    customer_name = request.form.get('customer_name', '').strip()
-    review_text   = request.form.get('review_text', '').strip()
-    try:
-        rating = int(request.form.get('rating', '5'))
-    except ValueError:
-        rating = 5
-    headphones, _ = load_data()
-    if product_name not in headphones or rating < 1 or rating > 5 or not customer_name:
-        flash("Please choose a product, name, and rating.", 'community_error')
-        return redirect(url_for('community'))
-    with sqlite3.connect(reviews_db_path()) as conn:
-        conn.execute('''
-            INSERT INTO community_reviews (product_name, customer_name, rating, review_text)
-            VALUES (?, ?, ?, ?)
-        ''', (product_name, customer_name, rating, review_text))
-        conn.commit()
-    flash("Thanks for sharing your rating.", 'community_success')
-    return redirect(url_for('community'))
-
-@app.route('/community/feedback', methods=['POST'])
-def community_feedback():
-    name    = request.form.get('name', '').strip()
-    email   = request.form.get('email', '').strip()
+@app.route('/contact', methods=['POST'])
+def contact():
+    name = request.form.get('name', '').strip()
+    email = request.form.get('email', '').strip()
     message = request.form.get('message', '').strip()
     if not name or not email or not message:
-        flash("Please complete every question field.", 'community_error')
-        return redirect(url_for('community'))
-    with sqlite3.connect(feedback_db_path()) as conn:
-        conn.execute('''
-            INSERT INTO feedback_messages (name, email, message)
-            VALUES (?, ?, ?)
-        ''', (name, email, message))
-        conn.commit()
-    flash("Question submitted. Thank you.", 'community_success')
-    return redirect(url_for('community'))
+        flash("Please fill in all contact fields.", 'contact_error')
+    else:
+        with sqlite3.connect(contacts_db_path()) as conn:
+            conn.execute('''
+                INSERT INTO contact_messages (name, email, message)
+                VALUES (?, ?, ?)
+            ''', (name, email, message))
+        flash("Thanks, your message has been sent.", 'contact_success')
+    return redirect(url_for('home') + '#contact')
 
 @app.route('/add_to_cart', methods=['POST'])
 def add_to_cart():
@@ -784,8 +686,7 @@ def checkout():
         for item, details in headphones_cart.items():
             if item in headphones:
                 headphones[item]['stock'] = max(0, headphones[item]['stock'] - details['quantity'])
-        with open('data/headphones.json', 'w') as f:
-            json.dump(headphones, f, indent=4)
+        save_headphones(headphones, 'Checkout')
     except OSError as e:
         print(f"Error updating headphones stock: {e}")
 
@@ -793,8 +694,7 @@ def checkout():
         for item, details in addons_cart.items():
             if item in addons:
                 addons[item]['stock'] = max(0, addons[item]['stock'] - details['quantity'])
-        with open('data/addons.json', 'w') as f:
-            json.dump(addons, f, indent=4)
+        save_addons(addons, 'Checkout')
     except OSError as e:
         print(f"Error updating addons stock: {e}")
 

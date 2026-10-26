@@ -18,8 +18,7 @@
             </div>
             <ul class="nav-links">
                 <li class="nav-link-item"><a href="{{ url_for('home') }}">Home</a></li>
-                <li class="nav-link-item"><a href="{{ url_for('catalog') }}">Catalog</a></li>
-                <li class="nav-link-item"><a href="{{ url_for('community') }}">Community</a></li>
+                <li class="nav-link-item"><a href="{{ url_for('home') }}#catalog">Catalog</a></li>
                 <li class="nav-link-item"><a href="{{ url_for('orders') }}">Orders</a></li>
                 <li class="cart-nav">
                     <button class="cart-nav-button" type="button" aria-label="Open cart" aria-controls="cartDrawer">
@@ -187,7 +186,7 @@
             {% else %}
                 <div class="cart-empty">
                     <p>Your cart is empty</p>
-                    <a href="{{ url_for('catalog') }}" class="btn btn-primary">Browse Collection</a>
+                    <a href="{{ url_for('home') }}#catalog" class="btn btn-primary">Browse Collection</a>
                 </div>
             {% endif %}
         </div>
@@ -298,28 +297,30 @@
     {% endwith %}
 
     <footer>
-        <div class="footer-content">
-            <div class="footer-social">
-                <a href="#" title="Twitter" aria-label="Twitter">
-                    <img class="icon" src="{{ url_for('static', filename='icons/svg/brands/bx-twitter.svg') }}" alt="">
-                </a>
-                <a href="#" title="Instagram" aria-label="Instagram">
-                    <img class="icon" src="{{ url_for('static', filename='icons/svg/brands/bx-instagram-alt.svg') }}" alt="">
-                </a>
-                <a href="#" title="Facebook" aria-label="Facebook">
-                    <img class="icon" src="{{ url_for('static', filename='icons/svg/brands/bx-facebook-square.svg') }}" alt="">
-                </a>
-                <a href="#" title="YouTube" aria-label="YouTube">
-                    <img class="icon" src="{{ url_for('static', filename='icons/svg/brands/bx-youtube.svg') }}" alt="">
-                </a>
-            </div>
-            <div class="footer-links">
-                <a href="/about">About Us</a>
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Contact</a>
-                <a href="#">FAQ</a>
-            </div>
+        <div class="footer-content" id="contact">
+            <section class="footer-contact">
+                <h2>Contact us</h2>
+                {% with messages = get_flashed_messages(category_filter=['contact_success', 'contact_error']) %}
+                    {% for message in messages %}
+                    <p class="contact-message">{{ message }}</p>
+                    {% endfor %}
+                {% endwith %}
+                <form action="{{ url_for('contact') }}" method="post" class="contact-form">
+                    <label>
+                        Name
+                        <input type="text" name="name" value="{{ session.get('username', '') }}" required>
+                    </label>
+                    <label>
+                        Email
+                        <input type="email" name="email" value="{{ session.get('user_email', '') }}" required>
+                    </label>
+                    <label>
+                        Message
+                        <textarea name="message" rows="3" required></textarea>
+                    </label>
+                    <button type="submit" class="btn btn-primary">Send</button>
+                </form>
+            </section>
             <div class="footer-bottom">
                 <p>&copy; 2024 AudioZone. Premium headphones for audiophiles. All rights reserved.</p>
             </div>

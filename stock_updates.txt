@@ -1,0 +1,22 @@
+AudioZone Stock Update Log
+
+Starting stock levels (19 October 2026):
+Headphones:
+  AirPods Pro: 128
+  AirPods 3: 116
+  Sony WH-1000XM5: 142
+  Bose QuietComfort 45: 134
+  Beats Studio Pro: 109
+  Sennheiser Momentum 4: 121
+
+Accessories:
+  Premium Audio Cable: 175
+  Carrying Case: 154
+  Extra Ear Pads: 163
+  USB-C Adapter: 187
+
+Stock changes made through product updates and completed checkouts are added below.
+2026-10-21 11:10:05 | Checkout | AirPods Pro: 128 -> 126
+2026-10-21 11:10:05 | Checkout | AirPods 3: 116 -> 113
+2026-10-21 11:10:05 | Checkout | Sony WH-1000XM5: 142 -> 141
+2026-10-21 11:10:05 | Checkout | Premium Audio Cable: 175 -> 174

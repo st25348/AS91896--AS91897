@@ -172,37 +172,3 @@ function applyCatalogFilters() {
     if (input) input.addEventListener('change', applyCatalogFilters);
 });
 applyCatalogFilters();
-
-// ── Testimonials carousel ─────────────────────────────────────────
-const carousel = document.querySelector('[data-carousel]');
-if (carousel) {
-    const cards = Array.from(carousel.querySelectorAll('.testimonial-card'));
-    const prev = carousel.querySelector('.carousel-prev');
-    const next = carousel.querySelector('.carousel-next');
-    let start = 0;
-
-    function visibleCount() {
-        return window.matchMedia('(max-width: 968px)').matches ? 1 : 3;
-    }
-
-    function renderCarousel() {
-        const count = visibleCount();
-        cards.forEach((card, index) => {
-            const offset = (index - start + cards.length) % cards.length;
-            card.classList.toggle('is-hidden', offset >= count);
-        });
-    }
-
-    function moveCarousel(direction) {
-        start = (start + direction + cards.length) % cards.length;
-        renderCarousel();
-    }
-
-    if (prev) prev.addEventListener('click', () => moveCarousel(-1));
-    if (next) next.addEventListener('click', () => moveCarousel(1));
-    window.addEventListener('resize', renderCarousel);
-    renderCarousel();
-    if (cards.length > visibleCount()) {
-        window.setInterval(() => moveCarousel(1), 5000);
-    }
-}

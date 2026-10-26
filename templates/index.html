@@ -5,104 +5,23 @@
 {% block content %}
 <div class="hero">
     <video autoplay muted loop playsinline class="hero-video">
-          <source src="/static/Videos/headphone-hero.mp4" type="video/mp4">
-          Your browser does not support the video tag.
+        <source src="/static/Videos/headphone-hero.mp4" type="video/mp4">
+        Your browser does not support the video tag.
     </video>
     <div class="hero-container">
         <div class="hero-left">
             <h1>AudioZone</h1>
-            <p class="hero-subtitle">Premium Audio Experience</p>
-            <p>Discover our curated collection of high-fidelity headphones.</p>
-            <a href="{{ url_for('catalog') }}" class="hero-link">
-                Explore Collection
+            <p class="hero-subtitle">Student-run audio, made more accessible</p>
+            <p>Founded by students at Ormiston Senior College, AudioZone helps classmates find quality headphones for study, music classes and everyday listening. We source trusted brands through wholesale suppliers and offer selected products typically 20–25% below retail.</p>
+            <a href="#catalog" class="hero-link">
+                Shop the Catalog
                 <img class="icon" src="{{ url_for('static', filename='icons/svg/basic/bx-arrow-s-right.svg') }}" alt="">
             </a>
-        </div>
-
-        <div class="hero-center"></div>
-
-        <div class="hero-right">
-            <h2>Our Story</h2>
-            <p>At AudioZone, we believe that exceptional sound quality isn't just about technology, it's about passion.</p>
-            <p>Since our founding, we've been dedicated to bringing audiophiles the finest listening experiences through carefully curated, premium headphones.</p>
-            <p>Every product in our collection is chosen for its superior craftsmanship and acoustic excellence.</p>
         </div>
     </div>
 </div>
 
-<section class="story-row container">
-    <div>
-        <p class="section-eyebrow">Our Story</p>
-        <h2>Sound selected with care.</h2>
-        <p>We test comfort, tuning, battery life, and build quality before anything reaches the shelf. The result is a smaller, sharper catalogue built for daily listeners, travelers, creators, and anyone who notices the details.</p>
-        <p>AudioZone keeps the experience personal: clear recommendations, reliable accessories, and order support that follows through after checkout.</p>
-    </div>
-    <div class="story-image">
-        <img src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=900&q=80" alt="Premium headphones on a bright surface">
-    </div>
-</section>
-
-<section class="featured-products container">
-    <div class="section-header-centered">
-        <h2>Handpicked for You</h2>
-        <p>Four standouts from the full AudioZone catalogue.</p>
-    </div>
-    <div class="featured-grid">
-        {% for headphone, details in featured.items() %}
-        <div class="product-card product-card-featured">
-            <div class="product-image">
-                <img src="{{ details.image }}" alt="{{ headphone }}">
-            </div>
-            <div class="product-info">
-                <h2>{{ headphone }}</h2>
-                <p class="product-description">{{ details.description }}</p>
-                <p class="product-price">${{ details.price }}</p>
-                <form action="{{ url_for('add_to_cart') }}" method="post">
-                    <input type="hidden" name="next" value="{{ request.path }}">
-                    <input type="hidden" name="headphone" value="{{ headphone }}">
-                    <input type="hidden" name="quantity" value="1">
-                    <label>Color</label>
-                    <select name="color">
-                        {% for color in details.colors %}
-                            <option value="{{ color }}">{{ color }}</option>
-                        {% endfor %}
-                    </select>
-                    <button type="submit" class="btn btn-primary">Add to Cart</button>
-                </form>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    <div class="section-action">
-        <a href="{{ url_for('catalog') }}" class="btn btn-primary">
-            View Full Catalog
-            <img class="icon icon-light" src="{{ url_for('static', filename='icons/svg/basic/bx-arrow-s-right.svg') }}" alt="">
-        </a>
-    </div>
-</section>
-
-<section class="testimonials-section container">
-    <div class="section-header-centered">
-        <h2>What Customers Hear</h2>
-        <p>Recent 4-5 star feedback from the AudioZone community.</p>
-    </div>
-    <div class="testimonial-carousel" data-carousel>
-        <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous testimonial">
-            <img class="icon" src="{{ url_for('static', filename='icons/svg/basic/bx-chevron-left.svg') }}" alt="">
-        </button>
-        <div class="testimonial-track">
-            {% for testimonial in testimonials %}
-            <article class="testimonial-card">
-                <div class="testimonial-stars">{{ '★' * testimonial.rating }}{{ '☆' * (5 - testimonial.rating) }}</div>
-                <p>“{{ testimonial.quote }}”</p>
-                <strong>{{ testimonial.name }}</strong>
-                <span>{{ testimonial.product }}</span>
-            </article>
-            {% endfor %}
-        </div>
-        <button class="carousel-arrow carousel-next" type="button" aria-label="Next testimonial">
-            <img class="icon" src="{{ url_for('static', filename='icons/svg/basic/bx-chevron-right.svg') }}" alt="">
-        </button>
-    </div>
+<section class="catalog-home container" id="catalog">
+    {% include "catalog_content.html" %}
 </section>
 {% endblock %}
