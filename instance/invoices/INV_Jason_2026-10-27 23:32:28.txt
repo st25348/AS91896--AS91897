@@ -1,0 +1,13 @@
+Invoice Number: INV_Jason_2026-10-27 23:32:28
+Customer Name: Jason
+Date: 2026-10-27 23:32:28
+
+Items:
+  - AirPods Pro (Black): $249.00 x 2 = $498.00
+  - Carrying Case: $25.00 x 1 = $25.00
+  - Extra Ear Pads: $16.00 x 1 = $16.00
+  - Sony WH-1000XM5 (Black): $399.00 x 1 = $399.00
+
+Subtotal: $938.00
+Discounts - Order Over $500 -10% (10.00% combined): -$93.80
+Total: $844.20

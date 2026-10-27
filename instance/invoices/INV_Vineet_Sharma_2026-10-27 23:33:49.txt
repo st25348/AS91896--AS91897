@@ -1,0 +1,10 @@
+Invoice Number: INV_Vineet_Sharma_2026-10-27 23:33:49
+Customer Name: Vineet Sharma
+Date: 2026-10-27 23:33:49
+
+Items:
+  - AirPods 3 (White): $199.00 x 2 = $398.00
+
+Subtotal: $398.00
+Discounts - AirPods 3 offer -10% (10.00% combined): -$39.80
+Total: $358.20

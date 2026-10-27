@@ -28,3 +28,21 @@ Stock changes made through product updates and completed checkouts are added bel
 2026-10-27 20:49:32 | Checkout | AirPods Pro: 120 -> 117
 2026-10-27 20:54:54 | Checkout | AirPods Pro: 117 -> 114
 2026-10-27 21:19:53 | Checkout | Sony WH-1000XM5: 136 -> 135
+2026-10-27 23:09:23 | Checkout | AirPods Pro: 114 -> 113
+2026-10-27 23:10:13 | Checkout | AirPods Pro: 113 -> 112
+2026-10-27 23:11:18 | Checkout | Sony WH-1000XM5: 135 -> 134
+2026-10-27 23:11:18 | Checkout | Carrying Case: 154 -> 150
+2026-10-27 23:11:41 | Checkout | Carrying Case: 150 -> 130
+2026-10-27 23:12:50 | Checkout | AirPods 3: 109 -> 108
+2026-10-27 23:12:50 | Checkout | Bose QuietComfort 45: 134 -> 133
+2026-10-27 23:26:42 | Checkout | Sony WH-1000XM5: 134 -> 133
+2026-10-27 23:32:28 | Checkout | AirPods Pro: 112 -> 110
+2026-10-27 23:32:28 | Checkout | Sony WH-1000XM5: 133 -> 132
+2026-10-27 23:32:28 | Checkout | Carrying Case: 130 -> 129
+2026-10-27 23:32:28 | Checkout | Extra Ear Pads: 163 -> 162
+2026-10-27 23:32:46 | Checkout | Bose QuietComfort 45: 133 -> 132
+2026-10-27 23:33:49 | Checkout | AirPods 3: 108 -> 106
+2026-10-27 23:36:28 | Checkout | AirPods 3: 106 -> 104
+2026-10-27 23:36:36 | Order cancellation INV_Vineet_Sharma_2026-10-27 23:36:28 | AirPods 3: 104 -> 106
+2026-10-27 23:37:06 | Checkout | AirPods 3: 106 -> 104
+2026-10-27 23:37:23 | Order cancellation INV_Vineet_Sharma_2026-10-27 23:37:06 | AirPods 3: 104 -> 106

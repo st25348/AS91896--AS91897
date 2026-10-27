@@ -9,13 +9,13 @@
         "name": "Carrying Case",
         "price": 25,
         "description": "Protective hard case for your headphones",
-        "stock": 154
+        "stock": 129
     },
     "Extra Ear Pads": {
         "name": "Extra Ear Pads",
         "price": 16,
         "description": "Replacement ear pads for comfort",
-        "stock": 163
+        "stock": 162
     },
     "USB-C Adapter": {
         "name": "USB-C Adapter",

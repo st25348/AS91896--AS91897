@@ -1,0 +1,9 @@
+Invoice Number: INV_Miguel_2026-10-27 23:32:46
+Customer Name: Miguel
+Date: 2026-10-27 23:32:46
+
+Items:
+  - Bose QuietComfort 45 (Black): $329.00 x 1 = $329.00
+
+Subtotal: $329.00
+Total: $329.00

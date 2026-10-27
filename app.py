@@ -715,6 +715,37 @@ def delete_order(invoice_number):
     with sqlite3.connect(orders_db_path()) as conn:
         cursor = conn.cursor()
         cursor.execute(
+            'SELECT items FROM orders WHERE invoice_number = ? AND user_id = ?',
+            (invoice_number, session['user_id'])
+        )
+        order = cursor.fetchone()
+
+        if not order:
+            flash("Order not found.", 'canceled')
+            return redirect(url_for('orders'))
+
+        try:
+            order_items = json.loads(order[0])
+            headphones, addons = load_data()
+
+            for item, details in order_items.items():
+                quantity = int(details['quantity'])
+                if quantity < 1:
+                    raise ValueError(f"Invalid quantity for {item}.")
+
+                inventory = headphones if details.get('color') is not None else addons
+                if item not in inventory:
+                    raise ValueError(f"{item} is no longer in inventory.")
+                inventory[item]['stock'] = int(inventory[item].get('stock', 0)) + quantity
+
+            save_headphones(headphones, f'Order cancellation {invoice_number}')
+            save_addons(addons, f'Order cancellation {invoice_number}')
+        except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError) as e:
+            print(f"Could not restore inventory for {invoice_number}: {e}")
+            flash("Could not cancel the order and restore its stock. Please try again.", 'canceled_error')
+            return redirect(url_for('orders'))
+
+        cursor.execute(
             'DELETE FROM orders WHERE invoice_number = ? AND user_id = ?',
             (invoice_number, session['user_id'])
         )

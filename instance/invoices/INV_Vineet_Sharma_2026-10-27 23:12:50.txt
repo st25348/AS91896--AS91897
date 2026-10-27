@@ -1,0 +1,11 @@
+Invoice Number: INV_Vineet_Sharma_2026-10-27 23:12:50
+Customer Name: Vineet Sharma
+Date: 2026-10-27 23:12:50
+
+Items:
+  - AirPods 3 (White): $199.00 x 1 = $199.00
+  - Bose QuietComfort 45 (Black): $329.00 x 1 = $329.00
+
+Subtotal: $528.00
+Discounts - Promo (AUDIO26 -20%) + Order Over $500 -10% + AirPods 3 offer -10% (40.00% combined): -$211.20
+Total: $316.80
