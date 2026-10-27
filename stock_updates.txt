@@ -20,3 +20,11 @@ Stock changes made through product updates and completed checkouts are added bel
 2026-10-21 11:10:05 | Checkout | AirPods 3: 116 -> 113
 2026-10-21 11:10:05 | Checkout | Sony WH-1000XM5: 142 -> 141
 2026-10-21 11:10:05 | Checkout | Premium Audio Cable: 175 -> 174
+2026-10-27 20:28:19 | Checkout | AirPods Pro: 126 -> 123
+2026-10-27 20:39:24 | Checkout | AirPods 3: 113 -> 109
+2026-10-27 20:39:24 | Checkout | Sony WH-1000XM5: 141 -> 136
+2026-10-27 20:39:24 | Checkout | USB-C Adapter: 187 -> 186
+2026-10-27 20:43:46 | Checkout | AirPods Pro: 123 -> 120
+2026-10-27 20:49:32 | Checkout | AirPods Pro: 120 -> 117
+2026-10-27 20:54:54 | Checkout | AirPods Pro: 117 -> 114
+2026-10-27 21:19:53 | Checkout | Sony WH-1000XM5: 136 -> 135

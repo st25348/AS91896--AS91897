@@ -1,7 +1,7 @@
 {
     "AirPods Pro": {
         "price": 249,
-        "stock": 126,
+        "stock": 114,
         "description": "Active noise cancellation with spatial audio",
         "image": "https://png.pngtree.com/png-vector/20231104/ourmid/pngtree-apple-airpods-pro-png-image_10477533.png",
         "colors": [
@@ -12,7 +12,7 @@
     },
     "AirPods 3": {
         "price": 199,
-        "stock": 113,
+        "stock": 109,
         "description": "Active noise cancellation with spatial audio",
         "image": "https://png.pngtree.com/png-clipart/20230504/ourmid/pngtree-airpods-png-image_7081756.png",
         "colors": [
@@ -23,7 +23,7 @@
     },
     "Sony WH-1000XM5": {
         "price": 399,
-        "stock": 141,
+        "stock": 135,
         "description": "Industry-leading noise cancellation",
         "image": "https://cdn.pricespy.co.nz/product/standard/280/13508897.jpg",
         "colors": [
@@ -44,7 +44,7 @@
     },
     "Beats Studio Pro": {
         "price": 349,
-        "stock": 109,
+        "stock": 50,
         "description": "Premium sound with spatial audio",
         "image": "https://assets.kogan.com/files/product/2025/Beats_2025/HKI-BSTUPRONAV_1N.jpg",
         "colors": [

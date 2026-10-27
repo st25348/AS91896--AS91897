@@ -8,6 +8,7 @@ import sqlite3
 import json
 import shutil
 from io import BytesIO
+from discounts import calculate_checkout_discounts
 
 app = Flask(__name__)
 app.secret_key = "ilikeheadphones"
@@ -166,16 +167,22 @@ def invoice_text(row):
     cart     = json.loads(row[2])
     savings  = row[4] or 0
     subtotal = round(row[3] + savings, 2)
+    discount = savings / subtotal if subtotal else 0
     lines    = [
         f"Invoice Number: {row[0]}", f"Customer Name: {row[1]}", f"Date: {row[6]}", "", "Items:",
     ]
     for item, details in cart.items():
         color_info = f" ({details['color']})" if details.get('color') else ""
-        lines.append(f"  - {item}{color_info}: ${details['price']} x {details['quantity']} = ${details['price'] * details['quantity']}")
-    lines.extend(["", f"Subtotal: ${subtotal}"])
+        line_total = details['price'] * details['quantity']
+        lines.append(
+            f"  - {item}{color_info}: ${details['price']:.2f} x {details['quantity']} = ${line_total:.2f}"
+        )
+    lines.extend(["", f"Subtotal: ${subtotal:.2f}"])
     if row[5]:
-        lines.append(f"Discount - {row[5]}: -${savings}")
-    lines.append(f"Total: ${row[3]}")
+        lines.append(
+            f"Discounts - {row[5]} ({discount * 100:.2f}% combined): -${savings:.2f}"
+        )
+    lines.append(f"Total: ${row[3]:.2f}")
     return "\n".join(lines) + "\n"
 
 
@@ -587,7 +594,7 @@ def apply_promo():
     promo_code = request.form.get('promo_code', '').strip().upper()
     if promo_code in PROMO_CODES:
         session['promo_code'] = promo_code
-        flash(f"Promo code {promo_code} applied — {int(PROMO_CODES[promo_code] * 100)}% off!", 'promo')
+        flash(f"Promo code {promo_code} saved — {int(PROMO_CODES[promo_code] * 100)}% off when selected at checkout.", 'promo')
     else:
         session.pop('promo_code', None)
         flash("Invalid promo code.", 'promo_error')
@@ -629,22 +636,13 @@ def checkout():
 
     headphones_cart  = {k: v for k, v in cart.items() if v['color'] is not None}
     addons_cart      = {k: v for k, v in cart.items() if v['color'] is None}
-    subtotal         = calculate_total(cart)
-
-    # discounts
     promo_code       = session.get('promo_code', '')
-    promo_discount   = PROMO_CODES.get(promo_code, 0)
-    order_discount   = 0.10 if subtotal >= 500 else 0
-    airpods_discount = 0.10 if 'AirPods 3' in headphones_cart else 0
-    discount         = min(promo_discount + order_discount + airpods_discount, 0.40)
-    savings          = round(subtotal * discount, 2)
-    total            = round(subtotal - savings, 2)
-
-    active_discounts = []
-    if promo_discount:   active_discounts.append(f"Promo ({promo_code} -{int(promo_discount*100)}%)")
-    if order_discount:   active_discounts.append("Order Over $500 -10%")
-    if airpods_discount: active_discounts.append("AirPods 3 -10%")
-    discount_label = " + ".join(active_discounts) if active_discounts else None
+    totals = calculate_checkout_discounts(cart, promo_code, PROMO_CODES)
+    subtotal        = totals['subtotal']
+    savings         = totals['savings']
+    total           = totals['total']
+    discount        = totals['discount']
+    discount_label  = totals['discount_label']
 
     invoice_date   = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     invoice_number = f"INV_{customer_name.replace(' ', '_')}_{invoice_date}"
@@ -654,9 +652,9 @@ def checkout():
         with sqlite3.connect(orders_db_path()) as conn:
             cursor = conn.cursor()
             cursor.execute('''
-                INSERT INTO orders (user_id, invoice_number, customer_name, items, total, savings, discount_label)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (user.id, invoice_number, customer_name, json.dumps(cart), total, savings, discount_label))
+                INSERT INTO orders (user_id, invoice_number, customer_name, items, total, savings, discount_label, date)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (user.id, invoice_number, customer_name, json.dumps(cart), total, savings, discount_label, invoice_date))
             conn.commit()
     except sqlite3.Error as e:
         flash("Database error occurred.")
@@ -666,17 +664,12 @@ def checkout():
     # write invoice file
     try:
         invoice_file_path = os.path.join(invoice_folder_path(), f"{invoice_number}.txt")
-        with open(invoice_file_path, 'w') as f:
-            f.write(f"Invoice Number: {invoice_number}\n")
-            f.write(f"Customer Name: {customer_name}\n")
-            f.write(f"Date: {invoice_date}\n\nItems:\n")
-            for item, details in cart.items():
-                color_info = f" ({details['color']})" if details['color'] else ""
-                f.write(f"  - {item.capitalize()}{color_info}: ${details['price']} x {details['quantity']} = ${details['price'] * details['quantity']}\n")
-            f.write(f"\nSubtotal: ${subtotal}\n")
-            if discount_label:
-                f.write(f"Discount — {discount_label} ({int(discount * 100)}%): -${savings}\n")
-            f.write(f"Total: ${total}\n")
+        invoice_row = (
+            invoice_number, customer_name, json.dumps(cart), total, savings,
+            discount_label, invoice_date,
+        )
+        with open(invoice_file_path, 'w', encoding='utf-8') as f:
+            f.write(invoice_text(invoice_row))
     except OSError as e:
         flash("Could not generate invoice file.")
         print(f"Error writing invoice: {e}")
@@ -755,7 +748,7 @@ def view_invoice(invoice_number):
         subtotal        = subtotal,
         savings         = savings,
         total           = row[3],
-        discount        = round(savings / subtotal, 2) if subtotal else 0,
+        discount        = savings / subtotal if subtotal else 0,
         discount_label  = discount_label,
         invoice_date    = row[6],
         invoice_number  = row[0],

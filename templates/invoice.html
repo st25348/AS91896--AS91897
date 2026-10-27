@@ -71,17 +71,17 @@
         <div class="invoice-totals">
             <div class="invoice-totals-row">
                 <span>Subtotal</span>
-                <span>${{ subtotal }}</span>
+                <span>${{ '%.2f' | format(subtotal) }}</span>
             </div>
             {% if discount_label %}
             <div class="invoice-totals-row invoice-totals-discount">
-                <span>{{ discount_label }} ({{ (discount * 100) | int }}% off)</span>
-                <span>-${{ savings }}</span>
+                <span>{{ discount_label }} ({{ '%.2f' | format(discount * 100) }}% combined)</span>
+                <span>-${{ '%.2f' | format(savings) }}</span>
             </div>
             {% endif %}
             <div class="invoice-totals-row invoice-totals-final">
                 <span>Total</span>
-                <span>${{ total }}</span>
+                <span>${{ '%.2f' | format(total) }}</span>
             </div>
         </div>
 

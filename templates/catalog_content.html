@@ -63,6 +63,11 @@
                     <input type="number" name="quantity" value="1" min="1" max="{{ details.stock }}">
                     <button type="submit" class="btn btn-secondary btn-block">Add to Cart</button>
                 </form>
+                {% with messages = get_flashed_messages(category_filter=[addon, addon ~ '_error']) %}
+                    {% for message in messages %}
+                    <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                {% endwith %}
             </div>
         </article>
         {% endfor %}

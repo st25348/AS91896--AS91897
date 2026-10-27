@@ -1,0 +1,12 @@
+Invoice Number: INV_Vineet_Sharma_2026-10-27 20:39:24
+Customer Name: Vineet Sharma
+Date: 2026-10-27 20:39:24
+
+Items:
+  - Airpods 3 (White): $199 x 4 = $796
+  - Sony wh-1000xm5 (Black): $399 x 5 = $1995
+  - Usb-c adapter: $13 x 1 = $13
+
+Subtotal: $2804
+Discount — Order Over $500 -10% (10%): -$280.4
+Total: $2523.6
