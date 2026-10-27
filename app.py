@@ -306,7 +306,7 @@ def current_user():
 
 @app.before_request
 def sync_session_user_details():
-    if session.get('user_id') and (not session.get('user_email') or 'is_admin' not in session):
+    if session.get('user_id'):
         user = current_user()
         if user:
             session['username']   = user.name

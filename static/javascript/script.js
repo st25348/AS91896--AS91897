@@ -20,6 +20,37 @@ if (profileMenu) {
     });
 }
 
+// ── Inventory table edit dialog ──────────────────────────────────
+const inventoryDialog = document.getElementById('inventoryEditDialog');
+const inventoryEditForm = inventoryDialog?.querySelector('[data-inventory-edit-form]');
+
+if (inventoryDialog && inventoryEditForm) {
+    const inventoryDialogTitle = inventoryDialog.querySelector('[data-inventory-dialog-title]');
+
+    document.querySelectorAll('[data-inventory-edit]').forEach(button => {
+        button.addEventListener('click', () => {
+            inventoryEditForm.action = button.dataset.action;
+            inventoryDialogTitle.textContent = `Edit ${button.dataset.name}`;
+
+            ['name', 'price', 'stock', 'image', 'description', 'colors'].forEach(fieldName => {
+                const field = inventoryEditForm.elements.namedItem(fieldName);
+                if (field) field.value = button.dataset[fieldName] || '';
+            });
+
+            inventoryDialog.showModal();
+            inventoryEditForm.elements.namedItem('name').focus();
+        });
+    });
+
+    inventoryDialog.querySelectorAll('[data-inventory-close]').forEach(button => {
+        button.addEventListener('click', () => inventoryDialog.close());
+    });
+
+    inventoryDialog.addEventListener('click', event => {
+        if (event.target === inventoryDialog) inventoryDialog.close();
+    });
+}
+
 // ── Back to top ────────────────────────────────────────────────────
 const backToTop = document.getElementById('back-to-top');
 window.addEventListener('scroll', () => {
