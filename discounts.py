@@ -9,18 +9,23 @@ PRODUCT_DISCOUNTS = {
 
 
 def calculate_checkout_discounts(cart, promo_code, promo_codes):
-    """Return the subtotal, combined savings, total, effective rate, and label."""
+    """Calculate the subtotal, savings, total, rate, and discount label."""
     subtotal = round(sum(
         details['price'] * details['quantity']
         for details in cart.values()
     ), 2)
 
     promo_rate = promo_codes.get(promo_code, 0)
-    order_rate = ORDER_VALUE_DISCOUNT if subtotal >= ORDER_VALUE_THRESHOLD else 0
+    order_rate = (
+        ORDER_VALUE_DISCOUNT
+        if subtotal >= ORDER_VALUE_THRESHOLD
+        else 0
+    )
 
     active_discounts = []
     if promo_rate:
-        active_discounts.append(f"Promo ({promo_code} -{int(promo_rate * 100)}%)")
+        active_discounts.append(
+            f"Promo ({promo_code} -{int(promo_rate * 100)}%)")
     if order_rate:
         active_discounts.append("Order Over $500 -10%")
 

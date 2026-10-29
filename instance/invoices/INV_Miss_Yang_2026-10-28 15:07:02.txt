@@ -1,0 +1,14 @@
+Invoice Number: INV_Miss_Yang_2026-10-28 15:07:02
+Customer Name: Miss Yang
+Date: 2026-10-28 15:07:02
+
+Items:
+  - AirPods 3 (White): $199.00 x 1 = $199.00
+  - AirPods Pro (White): $249.00 x 4 = $996.00
+  - Beats Studio Pro (Black): $349.00 x 4 = $1396.00
+  - Bose QuietComfort 45 (Black): $339.00 x 1 = $339.00
+  - Sony WH-1000XM5 (Black): $399.00 x 1 = $399.00
+
+Subtotal: $3329.00
+Discounts - Promo (AUDIO26 -20%) + Order Over $500 -10% + AirPods 3 offer -10% (40.00% combined): -$1331.60
+Total: $1997.40

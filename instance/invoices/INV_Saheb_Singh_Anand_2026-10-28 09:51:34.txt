@@ -1,0 +1,15 @@
+Invoice Number: INV_Saheb_Singh_Anand_2026-10-28 09:51:34
+Customer Name: Saheb Singh Anand
+Date: 2026-10-28 09:51:34
+
+Items:
+  - AirPods Pro (White): $249.00 x 1 = $249.00
+  - Carrying Case: $25.00 x 1 = $25.00
+  - Extra Ear Pads: $16.00 x 1 = $16.00
+  - Premium Audio Cable: $30.00 x 1 = $30.00
+  - Sony WH-1000XM5 (Black): $399.00 x 1 = $399.00
+  - USB-C Adapter: $13.00 x 1 = $13.00
+
+Subtotal: $732.00
+Discounts - Promo (AUDIO26 -20%) + Order Over $500 -10% (30.00% combined): -$219.60
+Total: $512.40

@@ -1764,59 +1764,14 @@ input[type="number"] { text-align: center; }
 footer {
     background: var(--bg);
     border-top: 1px solid var(--border);
-    padding: 3rem 0;
+    padding: 1.5rem 0;
     margin-top: 4rem;
     text-align: center;
 }
 
 .footer-content { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
 
-.footer-contact {
-    max-width: 700px;
-    margin: 0 auto 2rem;
-}
-
-.footer-contact h2 {
-    font-size: 1.5rem;
-    font-weight: 400;
-    margin-bottom: 1rem;
-}
-
-.contact-form {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    text-align: left;
-}
-
-.contact-form label {
-    display: grid;
-    gap: 0.4rem;
-    color: var(--text-light);
-    font-size: 0.9rem;
-}
-
-.contact-form label:nth-child(3),
-.contact-form button {
-    grid-column: 1 / -1;
-}
-
-.contact-form input,
-.contact-form textarea {
-    width: 100%;
-    padding: 0.7rem;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    font: inherit;
-}
-
-.contact-form textarea { resize: vertical; }
-.contact-form button { justify-self: center; }
-.contact-message { margin-bottom: 1rem; color: var(--text-light); }
-
 .footer-bottom {
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border);
     color: var(--text-light);
     font-size: 0.85rem;
 }

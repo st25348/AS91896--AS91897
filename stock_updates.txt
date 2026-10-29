@@ -48,3 +48,25 @@ Stock changes made through product updates and completed checkouts are added bel
 2026-10-27 23:37:23 | Order cancellation INV_Vineet_Sharma_2026-10-27 23:37:06 | AirPods 3: 104 -> 106
 2026-10-27 23:58:53 | Checkout | Sennheiser Momentum 4: 121 -> 117
 2026-10-27 23:59:13 | Order cancellation INV_Vineet_Sharma_2026-10-27 23:58:53 | Sennheiser Momentum 4: 117 -> 121
+2026-10-28 09:51:34 | Checkout | AirPods Pro: 110 -> 109
+2026-10-28 09:51:34 | Checkout | Sony WH-1000XM5: 132 -> 131
+2026-10-28 09:51:34 | Checkout | Premium Audio Cable: 174 -> 173
+2026-10-28 09:51:34 | Checkout | Carrying Case: 129 -> 128
+2026-10-28 09:51:34 | Checkout | Extra Ear Pads: 162 -> 161
+2026-10-28 09:51:34 | Checkout | USB-C Adapter: 186 -> 185
+2026-10-28 11:10:38 | Admin | Nothing Headphone (a): added with 150 in stock
+2026-10-28 11:13:17 | Admin | AirPods 3: 106 -> 150
+2026-10-28 11:14:10 | Admin | AirPods Pro: 109 -> 110
+2026-10-28 11:33:23 | Admin | headphones: added with 120 in stock
+2026-10-28 11:36:35 | Admin | headphones: added with 0 in stock
+2026-10-28 14:55:22 | Admin | Sony WH-1000XM5: 131 -> 132
+2026-10-28 15:07:02 | Checkout | AirPods Pro: 110 -> 106
+2026-10-28 15:07:02 | Checkout | AirPods 3: 150 -> 149
+2026-10-28 15:07:02 | Checkout | Sony WH-1000XM5: 132 -> 131
+2026-10-28 15:07:02 | Checkout | Bose QuietComfort 45: 132 -> 131
+2026-10-28 15:07:02 | Checkout | Beats Studio Pro: 50 -> 46
+2026-10-30 06:41:55 | Checkout | AirPods Pro: 106 -> 102
+2026-10-30 06:41:55 | Checkout | Carrying Case: 128 -> 126
+2026-10-30 06:42:23 | Order cancellation INV_Vineet_Sharma_2026-10-30 06:41:55 | AirPods Pro: 102 -> 106
+2026-10-30 06:42:23 | Order cancellation INV_Vineet_Sharma_2026-10-30 06:41:55 | Carrying Case: 126 -> 128
+2026-10-30 06:42:45 | Admin | AirPods Pro: 106 -> 110

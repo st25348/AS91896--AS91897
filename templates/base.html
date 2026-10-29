@@ -297,32 +297,9 @@
     {% endwith %}
 
     <footer>
-        <div class="footer-content" id="contact">
-            <section class="footer-contact">
-                <h2>Contact us</h2>
-                {% with messages = get_flashed_messages(category_filter=['contact_success', 'contact_error']) %}
-                    {% for message in messages %}
-                    <p class="contact-message">{{ message }}</p>
-                    {% endfor %}
-                {% endwith %}
-                <form action="{{ url_for('contact') }}" method="post" class="contact-form">
-                    <label>
-                        Name
-                        <input type="text" name="name" value="{{ session.get('username', '') }}" required>
-                    </label>
-                    <label>
-                        Email
-                        <input type="email" name="email" value="{{ session.get('user_email', '') }}" required>
-                    </label>
-                    <label>
-                        Message
-                        <textarea name="message" rows="3" required></textarea>
-                    </label>
-                    <button type="submit" class="btn btn-primary">Send</button>
-                </form>
-            </section>
+        <div class="footer-content">
             <div class="footer-bottom">
-                <p>&copy; 2024 AudioZone. Premium headphones for audiophiles. All rights reserved.</p>
+                <p>&copy; 2026 AudioZone. Premium headphones for audiophiles. All rights reserved.</p>
             </div>
         </div>
     </footer>

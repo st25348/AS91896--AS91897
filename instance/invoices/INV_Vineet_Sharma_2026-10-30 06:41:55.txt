@@ -1,0 +1,11 @@
+Invoice Number: INV_Vineet_Sharma_2026-10-30 06:41:55
+Customer Name: Vineet Sharma
+Date: 2026-10-30 06:41:55
+
+Items:
+  - AirPods Pro (Starlight): $249.00 x 4 = $996.00
+  - Carrying Case: $25.00 x 2 = $50.00
+
+Subtotal: $1046.00
+Discounts - Promo (AUDIO26 -20%) + Order Over $500 -10% (30.00% combined): -$313.80
+Total: $732.20
