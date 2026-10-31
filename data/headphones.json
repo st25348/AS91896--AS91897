@@ -1,9 +1,9 @@
 {
     "AirPods Pro": {
         "price": 249,
-        "stock": 110,
+        "stock": 107,
         "description": "Active noise cancellation with spatial audio",
-        "image": "https://png.pngtree.com/png-vector/20231104/ourmid/pngtree-apple-airpods-pro-png-image_10477533.png",
+        "image": "/static/images/pngtree-apple-airpods-pro-png-image_10477533.png",
         "colors": [
             "White",
             "Black",
@@ -14,7 +14,7 @@
         "price": 199,
         "stock": 149,
         "description": "Active noise cancellation with spatial audio",
-        "image": "https://png.pngtree.com/png-clipart/20230504/ourmid/pngtree-airpods-png-image_7081756.png",
+        "image": "/static/images/pngtree-airpods-png-image_7081756.png",
         "colors": [
             "White",
             "Black",
@@ -25,7 +25,7 @@
         "price": 399,
         "stock": 131,
         "description": "Industry-leading noise cancellation",
-        "image": "https://cdn.pricespy.co.nz/product/standard/280/13508897.jpg",
+        "image": "/static/images/Sony%20WH-1000XM5.jpg",
         "colors": [
             "Black",
             "Silver"
@@ -33,9 +33,9 @@
     },
     "Bose QuietComfort 45": {
         "price": 339,
-        "stock": 131,
+        "stock": 132,
         "description": "Legendary comfort and sound quality",
-        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUCBIC3Cuz9xvadd-c2K9M2NIXrsCHpTofmQ&s",
+        "image": "/static/images/Bose%20QuiteComfort%2045.jpeg",
         "colors": [
             "Black",
             "White Smoke",
@@ -44,9 +44,9 @@
     },
     "Beats Studio Pro": {
         "price": 349,
-        "stock": 46,
+        "stock": 50,
         "description": "Premium sound with spatial audio",
-        "image": "https://assets.kogan.com/files/product/2025/Beats_2025/HKI-BSTUPRONAV_1N.jpg",
+        "image": "/static/images/Beats%20Studio%20Pro.jpg",
         "colors": [
             "Black",
             "Navy",
@@ -54,15 +54,14 @@
             "Deep Brown"
         ]
     },
-    "headphones": {
-        "price": 100,
-        "stock": 0,
-        "description": "headphones",
-        "image": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTUCBIC3Cuz9xvadd-c2K9M2NIXrsCHpTofmQ&s",
+    "Sennheiser Momentum 4": {
+        "price": 379,
+        "stock": 121,
+        "description": "Audiophile-grade wireless headphones",
+        "image": "/static/images/Sennheiser_Momntum_4.jpg",
         "colors": [
-            "White",
             "Black",
-            "Starlight"
+            "White"
         ]
     }
 }

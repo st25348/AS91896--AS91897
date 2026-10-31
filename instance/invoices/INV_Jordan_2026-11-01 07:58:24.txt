@@ -1,0 +1,12 @@
+Invoice Number: INV_Jordan_2026-11-01 07:58:24
+Customer Name: Jordan
+Date: 2026-11-01 07:58:24
+
+Items:
+  - AirPods 3 (White): $199.00 x 1 = $199.00
+  - AirPods Pro (White): $249.00 x 1 = $249.00
+  - Premium Audio Cable: $30.00 x 1 = $30.00
+
+Subtotal: $478.00
+Discounts - Promo (AUDIO26 -20%) + AirPods 3 offer -10% (30.00% combined): -$143.40
+Total: $334.60

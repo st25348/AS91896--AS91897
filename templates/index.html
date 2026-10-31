@@ -3,6 +3,7 @@
 {% block title %}AudioZone - Premium Headphones{% endblock %}
 
 {% block content %}
+<!-- The hero introduces the store and directs visitors to the catalog below. -->
 <div class="hero">
     <video autoplay muted loop playsinline class="hero-video">
         <source src="/static/Videos/headphone-hero.mp4" type="video/mp4">
@@ -21,6 +22,7 @@
     </div>
 </div>
 
+<!-- Reuse the catalog partial so the home page and catalog share the same product cards. -->
 <section class="catalog-home container" id="catalog">
     {% include "catalog_content.html" %}
 </section>

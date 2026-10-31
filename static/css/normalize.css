@@ -1,30 +1,35 @@
-/* Normalize CSS */
+/* Minimal browser reset: remove default spacing and use predictable sizing. */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
+/* Keep text readable and prevent mobile browsers from resizing it unexpectedly. */
 html {
     line-height: 1.15;
     -webkit-text-size-adjust: 100%;
 }
 
+/* Inherit the app's system font stack and clear the browser's body margin. */
 body {
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
+/* Remove inconsistent default link decoration; component styles add it back when needed. */
 a {
     background-color: transparent;
     text-decoration: none;
 }
 
+/* Avoid borders on linked images and keep images inside their containers. */
 img {
     border-style: none;
     max-width: 100%;
 }
 
+/* Form controls inherit page typography rather than platform defaults. */
 button,
 input {
     font-family: inherit;
@@ -38,6 +43,7 @@ button {
     text-transform: none;
 }
 
+/* Normalize clickable controls and show a pointer for actions. */
 button,
 [type="button"],
 [type="submit"] {

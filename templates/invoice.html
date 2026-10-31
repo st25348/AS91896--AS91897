@@ -4,17 +4,17 @@
 {% block content %}
 <div class="invoice-page container">
 
-    <!-- Thank you banner -->
+    <!-- Confirmation heading identifies the customer after checkout succeeds. -->
     <div class="invoice-thankyou">
         <p class="invoice-eyebrow">Order Confirmed</p>
         <h1>Thank you, {{ customer_name }}!</h1>
         <p>Your order has been received and is being processed.</p>
     </div>
 
-    <!-- Invoice card -->
+    <!-- The invoice card groups line items, totals, and the return-to-store action. -->
     <div class="invoice-card">
 
-        <!-- Card header -->
+        <!-- Invoice number and checkout date identify this receipt. -->
         <div class="invoice-card-header">
             <div class="invoice-brand">Audio<span>Zone</span></div>
             <div class="invoice-meta">
@@ -23,7 +23,7 @@
             </div>
         </div>
 
-        <!-- Headphones -->
+        <!-- Headphone lines include the selected color; omit the section when there are none. -->
         {% if headphones_cart %}
         <div class="invoice-section-label">Headphones</div>
         <div class="invoice-items">
@@ -46,7 +46,7 @@
         </div>
         {% endif %}
 
-        <!-- Add-ons -->
+        <!-- Add-on lines are separate because they do not have color selections. -->
         {% if addons_cart %}
         <div class="invoice-section-label">Add-ons</div>
         <div class="invoice-items">
@@ -67,7 +67,7 @@
         </div>
         {% endif %}
 
-        <!-- Totals -->
+        <!-- Totals include the subtotal, any combined discount, and the amount charged. -->
         <div class="invoice-totals">
             <div class="invoice-totals-row">
                 <span>Subtotal</span>
@@ -85,7 +85,7 @@
             </div>
         </div>
 
-        <!-- Footer note -->
+        <!-- The receipt is also saved to order history; this button returns to the shop. -->
         <div class="invoice-card-footer">
             <p>A full receipt has been saved to your order history.</p>
             <a href="{{ url_for('home') }}" class="btn btn-primary">

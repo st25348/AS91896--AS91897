@@ -1,0 +1,11 @@
+Invoice Number: INV_Vineet_Sharma_2026-11-01 08:40:49
+Customer Name: Vineet Sharma
+Date: 2026-11-01 08:40:49
+
+Items:
+  - AirPods Pro (White): $249.00 x 2 = $498.00
+  - Extra Ear Pads: $16.00 x 2 = $32.00
+
+Subtotal: $530.00
+Discounts - Order Over $500 -10% (10.00% combined): -$53.00
+Total: $477.00

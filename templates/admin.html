@@ -3,6 +3,7 @@
 {% block title %}Admin - AudioZone{% endblock %}
 
 {% block content %}
+<!-- The admin screen groups product creation, inventory review, and in-place editing. -->
 <div class="admin-page container">
     <div class="admin-header">
         <div>
@@ -12,6 +13,7 @@
         <a href="{{ url_for('home') }}" class="btn btn-secondary">Back to Store</a>
     </div>
 
+    <!-- Feedback categories are separated so successful saves and errors can be styled differently. -->
     {% with messages = get_flashed_messages(category_filter=['admin_success']) %}
         {% if messages %}
             <div class="flash-message">{{ messages[0] }}</div>
@@ -23,6 +25,7 @@
         {% endif %}
     {% endwith %}
 
+    <!-- New products are validated by the add_product route before saving to the catalog. -->
     <section class="admin-section">
         <h2>Add New Product</h2>
         <form class="admin-form admin-form-new" action="{{ url_for('add_product') }}" method="post">
@@ -56,6 +59,7 @@
         </form>
     </section>
 
+    <!-- The table is built from the current JSON catalog; each row carries its edit values in data attributes. -->
     <section class="admin-section inventory-section">
         <div class="inventory-section-heading">
             <h2>Inventory</h2>
@@ -74,6 +78,7 @@
                 </thead>
                 <tbody>
                     {% for product_name, details in headphones.items() %}
+                        {# Each row passes its current product fields to the reusable edit dialog. #}
                         <tr>
                             <td>
                                 <div class="inventory-product-cell">
@@ -108,6 +113,7 @@
         </div>
     </section>
 
+    <!-- JavaScript copies a selected row's data attributes into this reusable edit form. -->
     <dialog class="inventory-edit-dialog" id="inventoryEditDialog" aria-labelledby="inventoryDialogTitle">
         <div class="inventory-dialog-header">
             <div>

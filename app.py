@@ -1,4 +1,8 @@
-"""Flask application for the AudioZone storefront."""
+"""Flask application for the AudioZone storefront.
+
+Product catalogs live in JSON files, account data lives in SQLite, and the
+session holds temporary shopping-cart and sign-in state between requests.
+"""
 
 from flask import (
     Flask,
@@ -21,6 +25,7 @@ import shutil
 from io import BytesIO
 from discounts import calculate_checkout_discounts
 
+# App settings connect Flask sessions, account storage, and admin access.
 app = Flask(__name__)
 app.secret_key = "ilikeheadphones"
 ADMIN_SECRET_KEY = os.environ.get('ADMIN_SECRET_KEY', 'headphonesforlife')
@@ -29,7 +34,8 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
-# user model
+# Account records keep password hashes and the admin role; raw passwords are
+# never stored in the database.
 
 
 class User(db.Model):
@@ -50,13 +56,15 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
 
+# Promo codes map directly to their percentage discounts as decimal fractions.
 PROMO_CODES = {
     'AUDIO26': 0.20,
     'SAVE07':  0.10,
 }
 
 
-# db paths
+# Keep order and invoice files under Flask's instance directory so they stay
+# separate from the application source code.
 def orders_db_path():
     """Return the path to the orders database."""
     os.makedirs(app.instance_path, exist_ok=True)
@@ -70,7 +78,7 @@ def invoice_folder_path():
     return path
 
 
-# load json data
+# Catalog and inventory data is edited as JSON, independently of account data.
 def load_data():
     """Load the headphone and addon catalogs from JSON files."""
     try:
@@ -98,6 +106,7 @@ def save_addons(addons, source='Inventory update'):
 
 def log_stock_change(name, old_stock, new_stock, source):
     """Append a log entry when an item stock count changes."""
+    # This log tracks inventory changes, so ignore edits to other product data.
     if old_stock == new_stock:
         return
     if old_stock is None:
@@ -118,6 +127,7 @@ def log_stock_change(name, old_stock, new_stock, source):
 
 def save_inventory_data(path, items, source):
     """Save inventory data and log changes from the previous file."""
+    # Read the old catalog before writing so each stock change can be recorded.
     try:
         with open(path, encoding='utf-8') as f:
             previous_items = json.load(f)
@@ -127,22 +137,25 @@ def save_inventory_data(path, items, source):
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(items, f, indent=4)
 
+    # Match products by name to detect stock changes and new products.
     for name, details in items.items():
         old_stock = previous_items.get(name, {}).get('stock')
         new_stock = details.get('stock')
         log_stock_change(name, old_stock, new_stock, source)
 
+    # Any old product missing from the new catalog has been removed.
     for name, details in previous_items.items():
         if name not in items:
             log_stock_change(name, details.get('stock'), None, source)
 
 
-# parse and validate product form
+# Normalize and validate the admin form before it changes the catalog.
 def parse_product_form():
     """Validate product form fields and return the product data."""
     name = request.form.get('name', '').strip()
     description = request.form.get('description', '').strip()
     image = request.form.get('image', '').strip()
+    # The form accepts comma-separated colors but the catalog stores a list.
     colors = [c.strip() for c in request.form.get(
         'colors', '').split(',') if c.strip()]
 
@@ -177,7 +190,7 @@ def parse_product_form():
     }, None
 
 
-# cart helpers
+# Small cart helpers are shared by the storefront, drawer, and checkout.
 def calculate_total(cart):
     """Return the sum of all cart item totals."""
     return sum(item['price'] * item['quantity'] for item in cart.values())
@@ -185,10 +198,12 @@ def calculate_total(cart):
 
 def cart_redirect():
     """Redirect to the requested page or the current page."""
+    # Prefer the form's return target, then the referrer, then the storefront.
     target = request.form.get('next') or request.referrer or url_for('home')
     return redirect(target)
 
-# fetch single order for current user
+# Scope invoice lookup to the signed-in account so another user's invoice
+# cannot be opened by guessing its number.
 
 
 def get_order_for_user(invoice_number):
@@ -203,11 +218,13 @@ def get_order_for_user(invoice_number):
         return cursor.fetchone()
 
 
-# format invoice as plain text
+# Convert a saved order row into the text used by invoice files and downloads.
 def invoice_text(row):
     """Format an order row as a plain text invoice."""
     cart = json.loads(row[2])
     savings = row[4] or 0
+    # The stored total is after discounts, so add savings back to recover the
+    # pre-discount subtotal shown on the receipt.
     subtotal = round(row[3] + savings, 2)
     discount = savings / subtotal if subtotal else 0
     lines = [
@@ -234,18 +251,22 @@ def invoice_text(row):
     return "\n".join(lines) + "\n"
 
 
-# build a minimal pdf in memory
+# Build a lightweight PDF in memory without a separate document library.
 def simple_pdf_bytes(title, body):
     """Build a minimal PDF invoice in memory."""
+    # Escape PDF string delimiters before inserting user-facing text into the
+    # page content stream.
     text = body.replace('\\', '\\\\').replace('(', '\\(').replace(')', '\\)')
     lines = text.splitlines()
     content_lines = ["BT", "/F1 11 Tf",
                      "50 770 Td", f"({title}) Tj", "0 -24 Td"]
+    # Keep the page to a readable single-page length.
     for line in lines[:45]:
         content_lines.append(f"({line[:95]}) Tj")
         content_lines.append("0 -16 Td")
     content_lines.append("ET")
     stream = "\n".join(content_lines)
+    # PDF objects describe the document, page, font, and rendered text stream.
     objects = [
         "1 0 obj << /Type /Catalog /Pages 2 0 R >> endobj\n",
         "2 0 obj << /Type /Pages /Kids [3 0 R] /Count 1 >> endobj\n",
@@ -263,6 +284,7 @@ def simple_pdf_bytes(title, body):
     ]
     output = BytesIO()
     output.write(b"%PDF-1.4\n")
+    # The cross-reference table points to the byte offset of each PDF object.
     offsets = []
     for obj in objects:
         offsets.append(output.tell())
@@ -280,7 +302,8 @@ def simple_pdf_bytes(title, body):
     return output.getvalue()
 
 
-# migrate old invoices.db and folder to instance/
+# Copy legacy invoice data to the instance directory without overwriting files
+# that have already been migrated.
 def migrate_invoice_storage():
     """Copy legacy invoice data into the instance directory."""
     os.makedirs(app.instance_path, exist_ok=True)
@@ -298,7 +321,7 @@ def migrate_invoice_storage():
                 shutil.copy2(old_file, new_file)
 
 
-# db init
+# Create order storage and add columns that may be missing from older databases.
 def init_orders_db():
     """Create the orders table and add missing columns."""
     with sqlite3.connect(orders_db_path()) as conn:
@@ -324,11 +347,13 @@ def init_orders_db():
             try:
                 cursor.execute(f'ALTER TABLE orders ADD COLUMN {col}')
             except sqlite3.OperationalError:
+                # The column already exists on databases that were migrated.
                 pass
 
 
 def initialize_data_base():
     """Migrate invoice storage and initialize the databases."""
+    # Run legacy-file migration before creating the current order table.
     try:
         migrate_invoice_storage()
         init_orders_db()
@@ -344,6 +369,8 @@ def migrate_user_database():
         with sqlite3.connect(users_db) as conn:
             cursor = conn.cursor()
             try:
+                # Existing users databases need the role column; new tables get
+                # it from the SQLAlchemy model above.
                 cursor.execute(
                     'ALTER TABLE user ADD COLUMN is_admin '
                     'BOOLEAN NOT NULL DEFAULT 0'
@@ -355,7 +382,8 @@ def migrate_user_database():
         print(f"Error updating users database: {e}")
 
 
-# session helpers
+# Session helpers expose the signed-in account to templates and protected
+# routes while the database remains the source of truth.
 def sign_in_user(user):
     """Store the signed-in user details in the session."""
     session['user_id'] = user.id
@@ -375,6 +403,7 @@ def current_user():
 @app.before_request
 def sync_session_user_details():
     """Refresh session details from the current user record."""
+    # Refresh each request so role or account changes take effect immediately.
     if session.get('user_id'):
         user = current_user()
         if user:
@@ -388,6 +417,7 @@ def inject_global_cart():
     """Provide cart and promo details to all templates."""
     cart = session.get('cart', {})
     promo_code = session.get('promo_code', '')
+    profile_user = current_user()
     return {
         'cart':            cart,
         'cart_item_count': sum(
@@ -397,16 +427,19 @@ def inject_global_cart():
         'promo_code':      promo_code,
         'promo_discount':  PROMO_CODES.get(promo_code, 0),
         'reopen_auth':     session.get('reopen_auth', ''),
+        'profile_user':    profile_user,
     }
 
 
-# auth decorators
+# Route decorators centralize sign-in and administrator checks for protected
+# views.
 def login_required(view_func):
     """Require a signed-in user before calling a view."""
     @wraps(view_func)
     def wrapped_view(*args, **kwargs):
         """Check for a signed-in user before calling the view."""
         if not current_user():
+            # Clear stale identity values so the next page opens the login panel.
             session.pop('user_id', None)
             session.pop('username', None)
             session.pop('user_email', None)
@@ -432,9 +465,11 @@ def admin_required(view_func):
     return wrapped_view
 
 
-# cart validation
+# Revalidate session cart contents against current catalog data before checkout;
+# browser-held prices, colors, and quantities are not trusted.
 def parse_quantity():
     """Parse a positive quantity from the submitted form."""
+    # Invalid text and zero/negative amounts are both rejected as no quantity.
     try:
         quantity = int(request.form.get('quantity', ''))
     except (TypeError, ValueError):
@@ -459,6 +494,8 @@ def validate_cart_stock(cart, headphones, addons):
                 "with a valid quantity."
             ), None
 
+        # A color identifies a headphone; add-ons have no color and use their
+        # own catalog for current price and stock.
         color = details.get('color')
         if color is not None:
             product = headphones.get(item)
@@ -490,10 +527,11 @@ def validate_cart_stock(cart, headphones, addons):
     return None, checked_cart
 
 
-# routes
+# Account and admin routes manage sessions and controlled catalog changes.
 @app.route('/login', methods=['POST'])
 def login():
     """Authenticate a user with the submitted email and password."""
+    # Normalize casing so email lookup behaves the same for every submission.
     email = request.form['email'].strip().lower()
     password = request.form['password']
     user = User.query.filter_by(email=email).first()
@@ -514,11 +552,13 @@ def register():
     password = request.form['password']
     confirm = request.form['confirm_password']
 
+    # Stop before hashing or saving if the confirmation does not match.
     if password != confirm:
         flash("Passwords do not match.", 'register_error')
         session['reopen_auth'] = 'register'
         return redirect(url_for('home'))
 
+    # Email is the account identifier, so it must be unique.
     if User.query.filter_by(email=email).first():
         flash("Email already registered.", 'register_error')
         session['reopen_auth'] = 'register'
@@ -550,6 +590,7 @@ def become_admin():
     if secret_key != ADMIN_SECRET_KEY:
         flash("That admin key is not correct.", 'profile_admin_error')
         return redirect(url_for('home'))
+    # Save the role to the database so it persists beyond this session.
     user = current_user()
     user.is_admin = True
     db.session.commit()
@@ -575,6 +616,7 @@ def add_product():
         flash(error, 'admin_error')
         return redirect(url_for('admin'))
     headphones, _ = load_data()
+    # Product names are dictionary keys, so reject duplicates before writing.
     if product['name'] in headphones:
         flash("A product with that name already exists.", 'admin_error')
         return redirect(url_for('admin'))
@@ -596,9 +638,11 @@ def update_product(product_name):
         flash(error, 'admin_error')
         return redirect(url_for('admin'))
     headphones, _ = load_data()
+    # Confirm that the requested product still exists before applying edits.
     if product_name not in headphones:
         flash("Product not found.", 'admin_error')
         return redirect(url_for('admin'))
+    # Renaming is allowed, but it cannot overwrite another product key.
     if product['name'] != product_name and product['name'] in headphones:
         flash("Another product already uses that name.", 'admin_error')
         return redirect(url_for('admin'))
@@ -618,6 +662,7 @@ def update_product(product_name):
 def home():
     """Render the storefront with the current inventory."""
     headphones, addons = load_data()
+    # Consume this one-shot flag so an auth panel opens only on the next page.
     reopen_auth = session.pop('reopen_auth', None)
     return render_template(
         'index.html',
@@ -637,6 +682,8 @@ def add_to_cart():
         flash("Please enter a valid quantity.", 'cart_error')
         return cart_redirect()
 
+    # The form identifies the catalog type so headphone colors and add-on stock
+    # can be checked against the correct inventory.
     if 'headphone' in request.form:
         item = request.form['headphone']
         color = request.form.get('color', 'Default')
@@ -665,6 +712,7 @@ def add_to_cart():
     except (AttributeError, TypeError, ValueError):
         current_quantity = 0
 
+    # Compare the requested amount with the total already held in the cart.
     if current_quantity + quantity > stock:
         stock_error_category = f"{item}_error"
         if current_quantity:
@@ -693,6 +741,7 @@ def add_to_cart():
 @app.route('/apply_promo', methods=['POST'])
 def apply_promo():
     """Validate and save a promo code in the session."""
+    # Store promo codes in a canonical uppercase form before lookup.
     promo_code = request.form.get('promo_code', '').strip().upper()
     if promo_code in PROMO_CODES:
         session['promo_code'] = promo_code
@@ -712,6 +761,7 @@ def apply_promo():
 def remove_from_cart(item):
     """Remove an item from the cart."""
     cart = session.get('cart', {})
+    # Removing an absent item is harmless; the cart may have changed in another tab.
     if item in cart:
         del cart[item]
         session['cart'] = cart
@@ -741,13 +791,16 @@ def checkout():
         flash(stock_error, 'cart_error')
         return redirect(request.referrer or url_for('home'))
 
+    # Continue with server-verified prices, colors, and quantities.
     cart = checked_cart
     session['cart'] = cart
     session.modified = True
 
+    # Headphones carry a selected color; add-ons are stored with color=None.
     headphones_cart = {k: v for k, v in cart.items() if v['color'] is not None}
     addons_cart = {k: v for k, v in cart.items() if v['color'] is None}
     promo_code = session.get('promo_code', '')
+    # Keep discount math in one helper and pass in this app's allowed codes.
     totals = calculate_checkout_discounts(cart, promo_code, PROMO_CODES)
     subtotal = totals['subtotal']
     savings = totals['savings']
@@ -758,7 +811,7 @@ def checkout():
     invoice_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     invoice_number = f"INV_{customer_name.replace(' ', '_')}_{invoice_date}"
 
-    # save order
+    # Save the database row first so invoice and stock updates refer to an order.
     try:
         with sqlite3.connect(orders_db_path()) as conn:
             cursor = conn.cursor()
@@ -784,7 +837,7 @@ def checkout():
         print(f"SQLite error: {e}")
         return redirect(url_for('home'))
 
-    # write invoice file
+    # Save a portable text receipt alongside the database order.
     try:
         invoice_file_path = os.path.join(
             invoice_folder_path(), f"{invoice_number}.txt")
@@ -798,7 +851,8 @@ def checkout():
         flash("Could not generate invoice file.")
         print(f"Error writing invoice: {e}")
 
-    # update stock
+    # Deduct inventory only after the cart has passed validation and the order
+    # has been saved.
     try:
         for item, details in headphones_cart.items():
             if item in headphones:
@@ -849,6 +903,7 @@ def delete_order(invoice_number):
         )
         order = cursor.fetchone()
 
+        # The owner filter prevents one customer from canceling another order.
         if not order:
             flash("Order not found.", 'canceled')
             return redirect(url_for('orders'))
@@ -857,6 +912,7 @@ def delete_order(invoice_number):
             order_items = json.loads(order[0])
             headphones, addons = load_data()
 
+            # Restore each line to its matching catalog before deleting the row.
             for item, details in order_items.items():
                 quantity = int(details['quantity'])
                 if quantity < 1:
@@ -908,6 +964,7 @@ def view_invoice(invoice_number):
         return redirect(url_for('orders'))
 
     cart = json.loads(row[2])
+    # Separate headphone and add-on lines so the invoice can render each table.
     headphones_cart = {k: v for k, v in cart.items() if v['color'] is not None}
     addons_cart = {k: v for k, v in cart.items() if v['color'] is None}
     savings = row[4]
@@ -935,6 +992,7 @@ def orders():
     """Render the signed-in user order history."""
     with sqlite3.connect(orders_db_path()) as conn:
         cursor = conn.cursor()
+        # Return only this account's orders, with the newest order first.
         cursor.execute('''
             SELECT invoice_number, customer_name, items, total, date
             FROM orders
@@ -967,6 +1025,8 @@ def download_invoice(invoice_number, file_type):
     text = invoice_text(row)
     safe_invoice = invoice_number.replace('/', '_')
 
+    # Both formats use the same invoice text to keep totals and line items in
+    # sync with the saved receipt.
     if file_type == 'txt':
         return Response(
             text,
@@ -992,7 +1052,7 @@ def download_invoice(invoice_number, file_type):
     return redirect(url_for('orders'))
 
 
-# startup
+# Prepare both databases when the module loads so routes can use current schemas.
 with app.app_context():
     migrate_user_database()
 initialize_data_base()

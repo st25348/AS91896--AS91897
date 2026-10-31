@@ -1,12 +1,15 @@
+<!-- Catalog introduction appears above the product and accessory lists. -->
 <header class="catalog-header">
     <p class="section-eyebrow">Catalog</p>
     <h1>Premium Headphones</h1>
     <p>The full AudioZone range. Choose a pair that suits you.</p>
 </header>
 
+<!-- Product cards are rendered from data/headphones.json; each form submits one chosen color and quantity. -->
 <section class="catalog-products">
     <div class="products-grid">
         {% for headphone, details in headphones.items() %}
+        {# Product details and image come from the catalog record, not JavaScript. #}
         <article class="product-card"
                  data-product-card
                  data-price="{{ details.price }}"
@@ -45,11 +48,13 @@
     </div>
 </section>
 
+<!-- Accessories use their own catalog and have no color selector. -->
 <section class="addons catalog-addons">
     <h2>Add-ons &amp; Accessories</h2>
     <p>Accessories to go with your headphones.</p>
     <div class="addons-grid">
         {% for addon, details in addons.items() %}
+        {# Each accessory posts its key and requested quantity to the shared cart route. #}
         <article class="addon-card">
             <div class="addon-info">
                 <h2>{{ details.name }}</h2>

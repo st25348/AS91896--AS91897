@@ -10,6 +10,7 @@
 <body data-logged-in="{{ 'true' if session.get('username') else 'false' }}"
       data-reopen-auth="{{ reopen_auth or '' }}">
 
+    <!-- Shared navigation keeps the storefront links, cart, and account menu on every page. -->
     <nav>
         <div class="nav-container">
             <div class="logo">
@@ -28,28 +29,29 @@
                         {% endif %}
                     </button>
                 </li>
-                {% if session.get('username') %}
+                {% if profile_user %}
                     <li class="profile-nav">
+                        <!-- The profile popover contains account details, admin access, and sign-out. -->
                         <details class="profile-menu">
                             <summary class="profile-trigger" aria-label="Open profile menu">
-                                <span class="profile-avatar">{{ session.get('username', 'U')[:1].upper() }}</span>
+                                <span class="profile-avatar">{{ profile_user.name[:1].upper() }}</span>
                             </summary>
                             <div class="profile-popover">
                                 <div class="profile-popover-header">
-                                    <span class="profile-avatar profile-avatar-large">{{ session.get('username', 'U')[:1].upper() }}</span>
+                                    <span class="profile-avatar profile-avatar-large">{{ profile_user.name[:1].upper() }}</span>
                                     <div>
                                         <p class="profile-label">Signed in as</p>
-                                        <h3>{{ session.get('username') }}</h3>
+                                        <h3>{{ profile_user.name }}</h3>
                                     </div>
                                 </div>
                                 <div class="profile-details">
                                     <div>
                                         <span>Name</span>
-                                        <strong>{{ session.get('username') }}</strong>
+                                        <strong>{{ profile_user.name }}</strong>
                                     </div>
                                     <div>
                                         <span>Email</span>
-                                        <strong>{{ session.get('user_email', 'Email unavailable') }}</strong>
+                                        <strong>{{ profile_user.email }}</strong>
                                     </div>
                                 </div>
                                 <div class="profile-admin">
@@ -58,9 +60,8 @@
                                             <div class="profile-admin-message">{{ messages[0] }}</div>
                                         {% endif %}
                                     {% endwith %}
-                                    {% if session.get('is_admin') %}
-                                        <a class="profile-admin-link" href="{{ url_for('admin') }}">Open Admin Panel</a>
-                                    {% else %}
+                                    <a class="profile-admin-link" href="{{ url_for('admin') }}">Admin Panel</a>
+                                    {% if not profile_user.is_admin %}
                                         <p>Are you an admin?</p>
                                         <form action="{{ url_for('become_admin') }}" method="post">
                                             <input type="password" name="admin_secret" placeholder="Secret key" required>
@@ -82,6 +83,7 @@
     {% block content %}
     {% endblock %}
 
+    <!-- The cart drawer is shared across pages and is filled from session cart data. -->
     <div class="cart-drawer-overlay" id="cartDrawerOverlay" hidden></div>
     <aside class="cart-drawer" id="cartDrawer" aria-hidden="true" aria-labelledby="cartDrawerTitle">
         <div class="cart-drawer-panel">
@@ -114,6 +116,7 @@
             {% endwith %}
 
             {% if cart %}
+                <!-- Each row shows the saved cart quantity and provides a remove action. -->
                 <div class="cart-items cart-items-drawer">
                     {% for item, details in cart.items() %}
                     <div class="cart-item cart-item-drawer">
@@ -130,6 +133,7 @@
                     {% endfor %}
                 </div>
 
+                <!-- Promo and checkout forms update the session cart and submit the order. -->
                 <div class="cart-footer cart-footer-drawer">
                     <div class="promo-section">
                         <p class="promo-label">Promo Code</p>
@@ -184,6 +188,7 @@
                     </div>
                 </div>
             {% else %}
+                <!-- Empty-cart state links back to the product catalog. -->
                 <div class="cart-empty">
                     <p>Your cart is empty</p>
                     <a href="{{ url_for('home') }}#catalog" class="btn btn-primary">Browse Collection</a>
@@ -192,7 +197,7 @@
         </div>
     </aside>
 
-    <!-- SINGLE OVERLAY — all panels hidden by default, JS shows the right one -->
+    <!-- One overlay hosts the login, registration, and post-login panels; JavaScript selects the active panel. -->
     <div class="auth-overlay" id="mainOverlay" style="display:none;">
         <div class="auth-modal">
 
@@ -204,7 +209,7 @@
                 <p class="auth-subtitle">Premium Audio Experience</p>
             </div>
 
-            <!-- PANEL: Login -->
+            <!-- Login panel posts credentials to the authentication route. -->
             <div id="panel-login" class="overlay-panel" style="display:none;">
                 <h3>Welcome Back</h3>
                 <p class="auth-description">Sign in to continue</p>
@@ -235,7 +240,7 @@
                 </div>
             </div>
 
-            <!-- PANEL: Register -->
+            <!-- Registration panel collects the fields needed to create an account. -->
             <div id="panel-register" class="overlay-panel" style="display:none;">
                 <h3>Create Account</h3>
                 <p class="auth-description">Join AudioZone today</p>
@@ -270,7 +275,7 @@
                 </div>
             </div>
 
-            <!-- PANEL: Post-login welcome -->
+            <!-- Welcome panel appears after a successful sign-in or registration. -->
             <div id="panel-loggedin" class="overlay-panel" style="display:none;">
                 <div class="welcome-body">
                     <h3>Welcome back, {{ session.get('username', '') }}!</h3>
@@ -288,7 +293,7 @@
         </div>
     </div>
 
-    <!-- Session flags for JS -->
+    <!-- Flash categories set one-time flags that JavaScript reads to open the welcome panel. -->
     {% with messages = get_flashed_messages(category_filter=['login_success']) %}
         {% if messages %}<script>sessionStorage.setItem('justLoggedIn','1')</script>{% endif %}
     {% endwith %}
@@ -296,6 +301,7 @@
         {% if messages %}<script>sessionStorage.setItem('justRegistered','1')</script>{% endif %}
     {% endwith %}
 
+    <!-- Shared footer appears below page content on every template that extends this base. -->
     <footer>
         <div class="footer-content">
             <div class="footer-bottom">

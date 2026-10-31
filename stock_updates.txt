@@ -70,3 +70,14 @@ Stock changes made through product updates and completed checkouts are added bel
 2026-10-30 06:42:23 | Order cancellation INV_Vineet_Sharma_2026-10-30 06:41:55 | AirPods Pro: 102 -> 106
 2026-10-30 06:42:23 | Order cancellation INV_Vineet_Sharma_2026-10-30 06:41:55 | Carrying Case: 126 -> 128
 2026-10-30 06:42:45 | Admin | AirPods Pro: 106 -> 110
+2026-11-01 07:58:24 | Checkout | AirPods Pro: 110 -> 109
+2026-11-01 07:58:24 | Checkout | AirPods 3: 150 -> 149
+2026-11-01 07:58:24 | Checkout | Premium Audio Cable: 173 -> 172
+2026-11-01 08:36:56 | Checkout | AirPods Pro: 109 -> 107
+2026-11-01 08:36:56 | Checkout | Beats Studio Pro: 50 -> 48
+2026-11-01 08:36:56 | Checkout | Carrying Case: 128 -> 127
+2026-11-01 08:37:37 | Order cancellation INV_Jordan_2026-11-01 08:36:56 | AirPods Pro: 107 -> 109
+2026-11-01 08:37:37 | Order cancellation INV_Jordan_2026-11-01 08:36:56 | Beats Studio Pro: 48 -> 50
+2026-11-01 08:37:37 | Order cancellation INV_Jordan_2026-11-01 08:36:56 | Carrying Case: 127 -> 128
+2026-11-01 08:40:49 | Checkout | AirPods Pro: 109 -> 107
+2026-11-01 08:40:49 | Checkout | Extra Ear Pads: 161 -> 159
